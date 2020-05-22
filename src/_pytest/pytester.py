@@ -555,6 +555,7 @@ class Testdir:
         self.chdir()
         self.request.addfinalizer(self.finalize)
         self._method = self.request.config.getoption("--runpytest")
+        self._created_files = set()
 
         mp = self.monkeypatch = MonkeyPatch()
         mp.setenv("PYTEST_DEBUG_TEMPROOT", str(self.test_tmproot))
@@ -631,7 +632,16 @@ class Testdir:
             p.write(source.strip().encode(encoding), "wb")
             if ret is None:
                 ret = p
+                if ret.strpath not in self._created_files:
+                    self._created_files.add(ret.strpath)
         return ret
+
+    @property
+    def created_files(self) -> set:
+        """
+        Return a set of created file paths which this instance of TestDir has created.
+        """
+        return self._created_files
 
     def makefile(self, ext, *args, **kwargs):
         r"""Create new file(s) in the testdir.
@@ -668,11 +678,45 @@ class Testdir:
         return py.iniconfig.IniConfig(p)["pytest"]
 
     def makepyfile(self, *args, **kwargs):
-        """Shortcut for .makefile() with a .py extension."""
+        """
+        Calls .makefile() with a .py extension
+        By default the name of the file will be the test_name.py
+        Calling multiple times without kwargs will override the initial file
+        To create multiple files, kwargs must provide a name when calling.
+
+        Examples:
+
+        .. code-block:: python
+
+            # initial file created named after the test
+            testdir.makepyfile("foo", "bar")
+            # initial file will be overwritten with the hello world lines
+            testdir.makepyfile("hello", "world")
+            # to create multiple files
+            testdir.makepyfile(custom_name="Second file")
+
+        """
         return self._makefile(".py", args, kwargs)
 
     def maketxtfile(self, *args, **kwargs):
-        """Shortcut for .makefile() with a .txt extension."""
+        """
+        Calls .makefile() with a .txt extension
+        By default the name of the file will be the test_name.txt
+        Calling multiple times without kwargs will override the initial file
+        To create multiple files, kwargs must provide a name when calling.
+
+        Examples:
+
+        .. code-block:: python
+
+            # initial file created named after the test
+            testdir.maketxtfile("foo", "bar")
+            # initial file will be overwritten with the hello world lines
+            testdir.maketxtfile("hello", "world")
+            # to create multiple files
+            testdir.maketxtfile(custom_name="Second file")
+
+        """
         return self._makefile(".txt", args, kwargs)
 
     def syspathinsert(self, path=None):
