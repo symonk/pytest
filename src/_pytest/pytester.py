@@ -698,7 +698,7 @@ class Testdir:
 
     def makepyfile(self, *args, **kwargs):
         """
-        Calls .makefile() with a .py extension
+        Calls _makefile() with a .py extension
         By default the name of the file will be the test_name.py
         Calling multiple times without kwargs will override the initial file
         To create multiple files, kwargs must provide a name when calling.
@@ -719,7 +719,7 @@ class Testdir:
 
     def maketxtfile(self, *args, **kwargs):
         """
-        Calls .makefile() with a .txt extension
+        Calls _makefile() with a .txt extension
         By default the name of the file will be the test_name.txt
         Calling multiple times without kwargs will override the initial file
         To create multiple files, kwargs must provide a name when calling.
