@@ -18,7 +18,6 @@ def pytest_addoption(parser):
         "--runxfail",
         action="store_true",
         dest="runxfail",
-        default=False,
         help="report the results of xfail tests as if they were not marked",
     )
 

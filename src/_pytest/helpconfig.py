@@ -65,14 +65,12 @@ def pytest_addoption(parser):
         "--traceconfig",
         "--trace-config",
         action="store_true",
-        default=False,
         help="trace considerations of conftest.py files.",
     )
     group.addoption(
         "--debug",
         action="store_true",
         dest="debug",
-        default=False,
         help="store internal tracing debug information in 'pytestdebug.log'.",
     )
     group._addoption(

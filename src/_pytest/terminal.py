@@ -116,7 +116,6 @@ def pytest_addoption(parser):
     group._addoption(
         "--disable-warnings",
         "--disable-pytest-warnings",
-        default=False,
         dest="disable_warnings",
         action="store_true",
         help="disable warnings summary",
@@ -126,7 +125,6 @@ def pytest_addoption(parser):
         "--showlocals",
         action="store_true",
         dest="showlocals",
-        default=False,
         help="show locals in tracebacks (disabled by default).",
     )
     group._addoption(
@@ -151,7 +149,6 @@ def pytest_addoption(parser):
         "--fulltrace",
         "--full-trace",
         action="store_true",
-        default=False,
         help="don't cut any tracebacks (default is to cut).",
     )
     group._addoption(

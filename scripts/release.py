@@ -115,7 +115,7 @@ def main():
     init(autoreset=True)
     parser = argparse.ArgumentParser()
     parser.add_argument("version", help="Release version")
-    parser.add_argument("--skip-check-links", action="store_true", default=False)
+    parser.add_argument("--skip-check-links", action="store_true")
     options = parser.parse_args()
     pre_release(options.version, skip_check_links=options.skip_check_links)
 

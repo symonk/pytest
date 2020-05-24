@@ -66,7 +66,6 @@ def pytest_addoption(parser):
     group.addoption(
         "--doctest-modules",
         action="store_true",
-        default=False,
         help="run doctests in all .py modules",
         dest="doctestmodules",
     )
@@ -89,14 +88,12 @@ def pytest_addoption(parser):
     group.addoption(
         "--doctest-ignore-import-errors",
         action="store_true",
-        default=False,
         help="ignore doctest ImportErrors",
         dest="doctest_ignore_import_errors",
     )
     group.addoption(
         "--doctest-continue-on-failure",
         action="store_true",
-        default=False,
         help="for a given doctest, continue to run after the first failure",
         dest="doctest_continue_on_failure",
     )

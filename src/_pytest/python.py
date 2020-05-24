@@ -64,7 +64,6 @@ def pytest_addoption(parser):
         "--funcargs",
         action="store_true",
         dest="showfixtures",
-        default=False,
         help="show available fixtures, sorted by plugin appearance "
         "(fixtures with leading '_' are only shown with '-v')",
     )
@@ -72,7 +71,6 @@ def pytest_addoption(parser):
         "--fixtures-per-test",
         action="store_true",
         dest="show_fixtures_per_test",
-        default=False,
         help="show fixtures per test",
     )
     parser.addini(

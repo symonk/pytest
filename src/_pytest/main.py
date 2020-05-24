@@ -87,7 +87,6 @@ def pytest_addoption(parser):
     group._addoption(
         "--continue-on-collection-errors",
         action="store_true",
-        default=False,
         dest="continue_on_collection_errors",
         help="Force test execution even if collection errors occur.",
     )
@@ -143,7 +142,6 @@ def pytest_addoption(parser):
         "--noconftest",
         action="store_true",
         dest="noconftest",
-        default=False,
         help="Don't load any conftest.py files.",
     )
     group.addoption(
@@ -151,14 +149,12 @@ def pytest_addoption(parser):
         "--keep-duplicates",
         action="store_true",
         dest="keepduplicates",
-        default=False,
         help="Keep duplicate tests.",
     )
     group.addoption(
         "--collect-in-virtualenv",
         action="store_true",
         dest="collect_in_virtualenv",
-        default=False,
         help="Don't ignore tests in a local virtualenv directory",
     )
 

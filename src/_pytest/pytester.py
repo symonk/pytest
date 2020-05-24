@@ -58,7 +58,6 @@ def pytest_addoption(parser):
         "--lsof",
         action="store_true",
         dest="lsof",
-        default=False,
         help="run FD checks if lsof is available",
     )
 
