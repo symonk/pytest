@@ -1169,3 +1169,64 @@ def test_cachedir_tag(testdir):
     cache.set("foo", "bar")
     cachedir_tag_path = cache._cachedir.joinpath("CACHEDIR.TAG")
     assert cachedir_tag_path.read_bytes() == CACHEDIR_TAG_CONTENT
+
+
+def test_lastfailed_show(testdir):
+    iter_range = 10
+    testdir.makepyfile(
+        """
+    import pytest
+    @pytest.mark.parametrize('dummy', range({}))
+    def test_something(dummy):
+        assert 0
+    """.format(
+            iter_range
+        )
+    )
+    testdir.runpytest()  # failure_setup
+    testdir.runpytest("--last-failed-show").stdout.fnmatch_lines_random(
+        [
+            "test_lastfailed_show.py::test_something[{}]".format(num)
+            for num in range(iter_range)
+        ]
+    )
+    testdir.runpytest("--lf-show").stdout.fnmatch_lines_random(
+        [
+            "test_lastfailed_show.py::test_something[{}]".format(num)
+            for num in range(iter_range)
+        ]
+    )
+
+
+def test_no_failures_with_lf_show(testdir):
+    testdir.makepyfile(
+        """
+    def test_no_failures():
+        assert 1
+        """
+    )
+    testdir.runpytest("--lf-show").stdout.fnmatch_lines("no last failed tests")
+    testdir.runpytest("--last-failed-show").stdout.fnmatch_lines("no last failed tests")
+
+
+def test_bad_file_with_lf_show(testdir):
+    lf_file = os.path.join(testdir.tmpdir, ".pytest_cache", "v", "cache", "lastfailed")
+    testdir.makepyfile(
+        """
+        def test_something():
+            pass
+        """
+    )
+    testdir.runpytest()
+    open(lf_file, "a")
+    testdir.runpytest("--lf-show").stdout.fnmatch_lines("no last failed tests")
+
+    with open(lf_file, "a") as test_file:
+        test_file.write("{broken: False")
+
+    result = testdir.runpytest("--last-failed-show")
+    assert result.ret == ExitCode.OK
+    result.stdout.fnmatch_lines("no last failed tests")
+    result = testdir.runpytest("--lf-show")
+    assert result.ret == ExitCode.OK
+    result.stdout.fnmatch_lines("no last failed tests")

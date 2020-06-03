@@ -6,6 +6,7 @@ ignores the external pytest-cache
 """
 import json
 import os
+from json.decoder import JSONDecodeError
 from typing import Dict
 from typing import Generator
 from typing import List
@@ -393,6 +394,13 @@ def pytest_addoption(parser):
         "at the last run (or all if none failed)",
     )
     group.addoption(
+        "--last-failed-show",
+        "--lf-show",
+        action="store_true",
+        dest="lfshow",
+        help="show last failed contents, don't perform collection or tests. ",
+    )
+    group.addoption(
         "--ff",
         "--failed-first",
         action="store_true",
@@ -445,6 +453,10 @@ def pytest_cmdline_main(config):
         from _pytest.main import wrap_session
 
         return wrap_session(config, cacheshow)
+    if config.option.lfshow:
+        from _pytest.main import wrap_session
+
+        return wrap_session(config, last_failed_show)
 
 
 @pytest.hookimpl(tryfirst=True)
@@ -484,7 +496,7 @@ def pytest_report_header(config):
         return "cachedir: {}".format(displaypath)
 
 
-def cacheshow(config, session):
+def cacheshow(config, session) -> int:
     from pprint import pformat
 
     tw = TerminalWriter()
@@ -521,4 +533,31 @@ def cacheshow(config, session):
             if p.is_file():
                 key = p.relative_to(basedir)
                 tw.line("{} is a file of length {:d}".format(key, p.stat().st_size))
+    return 0
+
+
+def last_failed_show(config, session) -> int:
+    terminal_writer = TerminalWriter()
+    last_failed_file_path = os.path.join(
+        config.cache._cachedir, "v", "cache", "lastfailed"
+    )
+    should_parse_file = (
+        os.path.isfile(last_failed_file_path)
+        and os.path.getsize(last_failed_file_path) > 0
+    )
+    no_last_failed_msg = "no last failed tests"
+    terminal_writer.sep("-", "last failed tests")
+    if not should_parse_file:
+        terminal_writer.line(no_last_failed_msg)
+    else:
+        with open(last_failed_file_path) as lf_file:
+            try:
+                lf_data = list(json.load(lf_file).keys())
+                if not lf_data:
+                    terminal_writer.line(no_last_failed_msg)
+                else:
+                    for test in lf_data:
+                        terminal_writer.line(test)
+            except JSONDecodeError:
+                terminal_writer.line(no_last_failed_msg)
     return 0
