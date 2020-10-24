@@ -189,7 +189,7 @@ Mark a test function as using the given fixture names.
     When using `usefixtures` in hooks, it can only load fixtures when applied to a test function before test setup
     (for example in the `pytest_collection_modifyitems` hook).
 
-    Also not that his mark has no effect when applied to **fixtures**.
+    Also note that this mark has no effect when applied to **fixtures**.
 
 
 
@@ -499,17 +499,21 @@ monkeypatch
     :members:
 
 
-.. fixture:: testdir
+.. fixture:: pytester
 
-testdir
-~~~~~~~
+pytester
+~~~~~~~~
+
+.. versionadded:: 6.2
 
 .. currentmodule:: _pytest.pytester
 
-This fixture provides a :class:`Testdir` instance useful for black-box testing of test files, making it ideal to
-test plugins.
+Provides a :class:`Pytester` instance that can be used to run and test pytest itself.
 
-To use it, include in your top-most ``conftest.py`` file:
+It provides an empty directory where pytest can be executed in isolation, and contains facilities
+to write tests, configuration files, and match against expected output.
+
+To use it, include in your topmost ``conftest.py`` file:
 
 .. code-block:: python
 
@@ -517,13 +521,29 @@ To use it, include in your top-most ``conftest.py`` file:
 
 
 
-.. autoclass:: Testdir()
+.. autoclass:: Pytester()
     :members:
 
 .. autoclass:: RunResult()
     :members:
 
 .. autoclass:: LineMatcher()
+    :members:
+
+.. autoclass:: HookRecorder()
+    :members:
+
+.. fixture:: testdir
+
+testdir
+~~~~~~~
+
+Identical to :fixture:`pytester`, but provides an instance whose methods return
+legacy ``py.path.local`` objects instead when applicable.
+
+New code should avoid using :fixture:`testdir` in favor of :fixture:`pytester`.
+
+.. autoclass:: Testdir()
     :members:
 
 
@@ -667,6 +687,10 @@ After collection is complete, you can modify the order of
 items, delete or otherwise amend the test items:
 
 .. autofunction:: pytest_collection_modifyitems
+
+.. note::
+    If this hook is implemented in ``conftest.py`` files, it always receives all collected items, not only those
+    under the ``conftest.py`` where it is implemented.
 
 .. autofunction:: pytest_collection_finish
 

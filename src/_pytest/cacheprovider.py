@@ -28,6 +28,7 @@ from _pytest.config.argparsing import Parser
 from _pytest.fixtures import FixtureRequest
 from _pytest.main import Session
 from _pytest.python import Module
+from _pytest.python import Package
 from _pytest.reports import TestReport
 
 
@@ -232,7 +233,10 @@ class LFPluginCollSkipfiles:
     def pytest_make_collect_report(
         self, collector: nodes.Collector
     ) -> Optional[CollectReport]:
-        if isinstance(collector, Module):
+        # Packages are Modules, but _last_failed_paths only contains
+        # test-bearing paths and doesn't try to include the paths of their
+        # packages, so don't filter them.
+        if isinstance(collector, Module) and not isinstance(collector, Package):
             if Path(str(collector.fspath)) not in self.lfplugin._last_failed_paths:
                 self.lfplugin._skipped_files += 1
 
@@ -382,7 +386,7 @@ class NFPlugin:
             self.cached_nodeids.update(item.nodeid for item in items)
 
     def _get_increasing_order(self, items: Iterable[nodes.Item]) -> List[nodes.Item]:
-        return sorted(items, key=lambda item: item.fspath.mtime(), reverse=True)
+        return sorted(items, key=lambda item: item.fspath.mtime(), reverse=True)  # type: ignore[no-any-return]
 
     def pytest_sessionfinish(self) -> None:
         config = self.config

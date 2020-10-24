@@ -210,7 +210,7 @@ class ApproxScalar(ApproxBase):
         # tolerances, i.e. non-numerics and infinities. Need to call abs to
         # handle complex numbers, e.g. (inf + 1j).
         if (not isinstance(self.expected, (Complex, Decimal))) or math.isinf(
-            abs(self.expected)
+            abs(self.expected)  # type: ignore[arg-type]
         ):
             return str(self.expected)
 
@@ -253,8 +253,8 @@ class ApproxScalar(ApproxBase):
         # Allow the user to control whether NaNs are considered equal to each
         # other or not.  The abs() calls are for compatibility with complex
         # numbers.
-        if math.isnan(abs(self.expected)):
-            return self.nan_ok and math.isnan(abs(actual))
+        if math.isnan(abs(self.expected)):  # type: ignore[arg-type]
+            return self.nan_ok and math.isnan(abs(actual))  # type: ignore[arg-type]
 
         # Infinity shouldn't be approximately equal to anything but itself, but
         # if there's a relative tolerance, it will be infinite and infinity
@@ -262,7 +262,7 @@ class ApproxScalar(ApproxBase):
         # case would have been short circuited above, so here we can just
         # return false if the expected value is infinite.  The abs() call is
         # for compatibility with complex numbers.
-        if math.isinf(abs(self.expected)):
+        if math.isinf(abs(self.expected)):  # type: ignore[arg-type]
             return False
 
         # Return true if the two numbers are within the tolerance.
@@ -443,7 +443,7 @@ def approx(expected, rel=None, abs=None, nan_ok: bool = False) -> ApproxBase:
       both ``a`` and ``b``, this test is symmetric (i.e.  neither ``a`` nor
       ``b`` is a "reference value").  You have to specify an absolute tolerance
       if you want to compare to ``0.0`` because there is no tolerance by
-      default.  Only available in python>=3.5.  `More information...`__
+      default.  `More information...`__
 
       __ https://docs.python.org/3/library/math.html#math.isclose
 
