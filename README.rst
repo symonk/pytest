@@ -50,6 +50,7 @@ An example of a simple test:
     def test_answer():
         assert inc(3) == 5
 
+.. code-block:: console
 
 To execute it::
 
